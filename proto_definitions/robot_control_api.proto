@@ -25,11 +25,19 @@ message BatteryLevelResponse{
 }
 
 // Bi-directional streaming message
-message MoveCommand {}
+message MoveCommand {
+enum Direction {
+        FORWARD = 0; // First enum value must always be 0 in proto3
+        LEFT = 1;
+        RIGHT = 2;
+        BACK = 3;
+    }
+    Direction direction = 1;
+}
 message TelemetryResponse {
-    float latitude = 1;
-    float longitude = 2;
-    float altitude = 3;
+    float pos_x = 1;
+    float pos_y = 2;
+    float pos_z = 3;
     float ang_vel_x = 4;
     float ang_vel_y = 5;
     float ang_vel_z = 6;

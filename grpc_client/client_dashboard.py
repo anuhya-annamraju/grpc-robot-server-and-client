@@ -1,84 +1,215 @@
 import os
 import sys
+import queue
+import threading
+import matplotlib
 
-import build_protos
+# Prefer a non-Tkinter backend on macOS, then Qt-based backends.
+for backend in ["MacOSX", "Qt5Agg", "QtAgg"]:
+    try:
+        matplotlib.use(backend, force=True)
+        break
+    except Exception:
+        continue
 
-# Run compilation first
-build_protos.compile_protos()
+import matplotlib.pyplot as plt
+from matplotlib.widgets import Button
 
-# Add the generated folder to the Python path so internal gRPC imports don't break
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "generated")))
 
 import grpc
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-
-# Import our freshly generated proto modules
 import robot_control_api_pb2
 import robot_control_api_pb2_grpc
 
 
 class RobotDashboard:
     def __init__(self):
-        # Set up a connection channel to your running C++ Server
+        self.time_data = []
+        self.pos_x_data = []
+        self.pos_y_data = []
+        self.pos_z_data = []
+        self.counter = 0
+        self.status_text = "Status: Ready"
+        self.robot_id = "Robot ID: --"
+        self.battery_text = "Battery: -- %"
         self.channel = grpc.insecure_channel("127.0.0.1:50051")
         self.stub = robot_control_api_pb2_grpc.RobotControlServicesStub(self.channel)
+        self.command_queue = queue.Queue()
+        self.telemetry_thread = None
+        self.battery_thread = None
+        self._build_ui()
+        self._start_background_tasks()
 
-        # Request configuration data packet
-        self.request = robot_control_api_pb2.BatteryLevelRequest()
+    def _build_ui(self):
+        self.fig = plt.figure(figsize=(11, 6), constrained_layout=True)
+        gs = self.fig.add_gridspec(5, 4)
 
-        # Initiate the server streaming response channel iterator
-        self.data_stream = self.stub.GetBatteryLevel(self.request)
+        self.ax_plot = self.fig.add_subplot(gs[:, :3])
+        self.ax_status = self.fig.add_subplot(gs[0, 3])
+        self.ax_button_forward = self.fig.add_subplot(gs[1, 3])
+        self.ax_button_left = self.fig.add_subplot(gs[2, 3])
+        self.ax_button_right = self.fig.add_subplot(gs[3, 3])
+        self.ax_close = self.fig.add_subplot(gs[4, 3])
 
-        # In-memory storage arrays for rendering the plot data
-        self.x_indices = []
-        self.percentages = []
-        self.frame_counter = 0
+        self.ax_plot.set_title("Position (X, Y, Z)")
+        self.ax_plot.set_xlabel("Time (ticks)")
+        self.ax_plot.set_ylabel("Position")
+        self.ax_plot.grid(True)
+        self.ax_plot.set_xlim(0, 10)
+        self.ax_plot.set_ylim(-10.0, 10.0)
 
-        # Initialize the plotting layout window
-        self.fig, self.ax = plt.subplots()
-        self.line, = self.ax.plot([], [], "r-o", label="Battery Level")
-        self.ax.legend(loc="upper left")
-        self.ax.grid(True)
+        self.line_x, = self.ax_plot.plot([], [], label="Pos X", color="red")
+        self.line_y, = self.ax_plot.plot([], [], label="Pos Y", color="green")
+        self.line_z, = self.ax_plot.plot([], [], label="Pos Z", color="blue")
+        self.ax_plot.legend(loc="upper left")
 
-    def update_plot(self, frame):
+        self.ax_status.axis("off")
+        self.ax_status.set_position([0.8, 0.8, 0.2, 0.2])
+        self.status_text_obj = self.ax_status.text(
+            0.0,
+            0.85,
+            self.status_text,
+            transform=self.ax_status.transAxes,
+            fontsize=12,
+            va="top",
+            bbox={"boxstyle": "round,pad=0.45", "facecolor": "#f7f7f7", "edgecolor": "#cccccc"},
+        )
+        self.robot_id_text_obj = self.ax_status.text(0.0, 0.62, self.robot_id, transform=self.ax_status.transAxes, fontsize=11)
+        self.battery_text_obj = self.ax_status.text(0.0, 0.48, self.battery_text, transform=self.ax_status.transAxes, fontsize=11)
+        self.ax_status.text(0.0, 0.34, "Telemetry: waiting", transform=self.ax_status.transAxes, fontsize=11)
+
+        button_kwargs = {"color": "#dddddd", "hovercolor": "#bbbbbb"}
+        self.btn_forward = Button(self.ax_button_forward, "Forward ⬆", **button_kwargs)
+        self.btn_left = Button(self.ax_button_left, "Left ⬅", **button_kwargs)
+        self.btn_right = Button(self.ax_button_right, "Right ➡", **button_kwargs)
+        self.btn_close = Button(self.ax_close, "Close Window", color="#f4b4b4", hovercolor="#e88b8b")
+
+        self.btn_forward.label.set_fontsize(12)
+        self.btn_left.label.set_fontsize(12)
+        self.btn_right.label.set_fontsize(12)
+        self.btn_close.label.set_fontsize(11)
+
+        self.btn_forward.on_clicked(lambda event: self.queue_move_command("FORWARD"))
+        self.btn_left.on_clicked(lambda event: self.queue_move_command("LEFT"))
+        self.btn_right.on_clicked(lambda event: self.queue_move_command("RIGHT"))
+        self.btn_close.on_clicked(lambda event: plt.close(self.fig))
+
+        self.ax_button_forward.patch.set_facecolor("#f3f3f3")
+        self.ax_button_left.patch.set_facecolor("#f3f3f3")
+        self.ax_button_right.patch.set_facecolor("#f3f3f3")
+        self.ax_button_forward.patch.set_edgecolor("#999999")
+        self.ax_button_left.patch.set_edgecolor("#999999")
+        self.ax_button_right.patch.set_edgecolor("#999999")
+        self.ax_button_forward.patch.set_linewidth(1)
+        self.ax_button_left.patch.set_linewidth(1)
+        self.ax_button_right.patch.set_linewidth(1)
+
+        self.ax_button_forward.axis("off")
+        self.ax_button_left.axis("off")
+        self.ax_button_right.axis("off")
+        self.ax_close.axis("off")
+
+    def _start_background_tasks(self):
+        self._fetch_robot_id()
+        self._start_battery_stream()
+        self._start_telemetry_stream()
+
+    def _fetch_robot_id(self):
+        thread = threading.Thread(target=self._robot_id_worker, daemon=True)
+        thread.start()
+
+    def _robot_id_worker(self):
         try:
-            # Pull the next frame from the live network stream
-            response = next(self.data_stream)
+            response = self.stub.GetRobotId(robot_control_api_pb2.RobotIdRequest())
+            self.robot_id = f"Robot ID: {response.id}"
+            self.robot_id_text_obj.set_text(self.robot_id)
+            self.fig.canvas.draw_idle()
+        except grpc.RpcError as exc:
+            print(f"Robot ID error: {exc}")
+            self.robot_id = "Robot ID: unavailable"
+            self.robot_id_text_obj.set_text(self.robot_id)
+            self.fig.canvas.draw_idle()
 
-            self.frame_counter += 1
-            self.x_indices.append(self.frame_counter)
-            self.percentages.append(response.percentage)
+    def _start_battery_stream(self):
+        if self.battery_thread and self.battery_thread.is_alive():
+            return
+        self.battery_thread = threading.Thread(target=self._battery_worker, daemon=True)
+        self.battery_thread.start()
 
-            # Keep only the last 30 data points so the chart doesn't crowd out
-            if len(self.x_indices) > 30:
-                self.x_indices.pop(0)
-                self.percentages.pop(0)
+    def _battery_worker(self):
+        try:
+            responses = self.stub.GetBatteryLevel(robot_control_api_pb2.BatteryLevelRequest())
+            for response in responses:
+                self.battery_text = f"Battery: {response.percentage} %"
+                self.battery_text_obj.set_text(self.battery_text)
+                self.fig.canvas.draw_idle()
+        except grpc.RpcError as exc:
+            print(f"Battery stream error: {exc}")
+        finally:
+            self.battery_thread = None
 
-            # Update data arrays inside the plot line layout
-            self.line.set_data(self.x_indices, self.percentages)
+    def _start_telemetry_stream(self):
+        if self.telemetry_thread and self.telemetry_thread.is_alive():
+            return
+        self.telemetry_thread = threading.Thread(target=self._telemetry_worker, daemon=True)
+        self.telemetry_thread.start()
 
-            # Dynamically recalculate axes boundaries based on current values
-            self.ax.relim()
-            self.ax.autoscale_view()
+    def _telemetry_worker(self):
+        try:
+            responses = self.stub.MoveRobotCommand(self.command_generator())
+            for response in responses:
+                self._handle_telemetry_response(response)
+        except grpc.RpcError as exc:
+            print(f"Telemetry stream error: {exc}")
+        finally:
+            self.telemetry_thread = None
 
-        except StopIteration:
-            print("Stream closed cleanly by the remote server.")
-        except grpc.RpcError as e:
-            print(f"Network stream connection severed: {e.details()}")
+    def _handle_telemetry_response(self, response):
+        print(f"Telemetry -> x={response.pos_x:.3f}, y={response.pos_y:.3f}, z={response.pos_z:.3f}")
+        self.counter += 1
+        self.time_data.append(self.counter)
+        self.pos_x_data.append(response.pos_x)
+        self.pos_y_data.append(response.pos_y)
+        self.pos_z_data.append(response.pos_z)
+
+        if len(self.time_data) > 50:
+            self.time_data.pop(0)
+            self.pos_x_data.pop(0)
+            self.pos_y_data.pop(0)
+            self.pos_z_data.pop(0)
+
+        self.line_x.set_data(self.time_data, self.pos_x_data)
+        self.line_y.set_data(self.time_data, self.pos_y_data)
+        self.line_z.set_data(self.time_data, self.pos_z_data)
+        self.ax_plot.relim()
+        self.ax_plot.autoscale_view()
+        self.fig.canvas.draw_idle()
+
+    def command_generator(self):
+        while True:
+            cmd = self.command_queue.get()
+            yield cmd
+
+    def queue_move_command(self, direction_str):
+        if direction_str == "FORWARD":
+            command = robot_control_api_pb2.MoveCommand(direction=robot_control_api_pb2.MoveCommand.Direction.FORWARD)
+        elif direction_str == "LEFT":
+            command = robot_control_api_pb2.MoveCommand(direction=robot_control_api_pb2.MoveCommand.Direction.LEFT)
+        elif direction_str == "RIGHT":
+            command = robot_control_api_pb2.MoveCommand(direction=robot_control_api_pb2.MoveCommand.Direction.RIGHT)
+        else:
             return
 
-        return self.line,
+        self.command_queue.put(command)
+        self.status_text = f"Command: {direction_str}"
+        self.status_text_obj.set_text(self.status_text)
+        self.fig.canvas.draw_idle()
+        print(self.status_text)
 
-    def run(self):
-        # Tie the network step update frame directly into matplotlib's render tick engine
-        self.ani = FuncAnimation(self.fig, self.update_plot, blit=False, interval=1000, cache_frame_data=False)
-        plt.title("Live Robot Battery Monitor")
-        plt.xlabel("Sample Count")
-        plt.ylabel("Battery Percentage")
+    def show(self):
         plt.show()
 
 
 if __name__ == "__main__":
     dashboard = RobotDashboard()
-    dashboard.run()
+    dashboard.show()

@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17robot_control_api.proto\"\x10\n\x0eRobotIdRequest\"\x1d\n\x0fRobotIdResponse\x12\n\n\x02id\x18\x01 \x01(\t\"\x15\n\x13\x42\x61tteryLevelRequest\"*\n\x14\x42\x61tteryLevelResponse\x12\x12\n\npercentage\x18\x01 \x01(\r\"\r\n\x0bMoveCommand\"\x83\x01\n\x11TelemetryResponse\x12\x10\n\x08latitude\x18\x01 \x01(\x02\x12\x11\n\tlongitude\x18\x02 \x01(\x02\x12\x10\n\x08\x61ltitude\x18\x03 \x01(\x02\x12\x11\n\tang_vel_x\x18\x04 \x01(\x02\x12\x11\n\tang_vel_y\x18\x05 \x01(\x02\x12\x11\n\tang_vel_z\x18\x06 \x01(\x02\x32\xc3\x01\n\x14RobotControlServices\x12/\n\nGetRobotId\x12\x0f.RobotIdRequest\x1a\x10.RobotIdResponse\x12@\n\x0fGetBatteryLevel\x12\x14.BatteryLevelRequest\x1a\x15.BatteryLevelResponse0\x01\x12\x38\n\x10MoveRobotCommand\x12\x0c.MoveCommand\x1a\x12.TelemetryResponse(\x01\x30\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17robot_control_api.proto\"\x10\n\x0eRobotIdRequest\"\x1d\n\x0fRobotIdResponse\x12\n\n\x02id\x18\x01 \x01(\t\"\x15\n\x13\x42\x61tteryLevelRequest\"*\n\x14\x42\x61tteryLevelResponse\x12\x12\n\npercentage\x18\x01 \x01(\r\"q\n\x0bMoveCommand\x12)\n\tdirection\x18\x01 \x01(\x0e\x32\x16.MoveCommand.Direction\"7\n\tDirection\x12\x0b\n\x07\x46ORWARD\x10\x00\x12\x08\n\x04LEFT\x10\x01\x12\t\n\x05RIGHT\x10\x02\x12\x08\n\x04\x42\x41\x43K\x10\x03\"y\n\x11TelemetryResponse\x12\r\n\x05pos_x\x18\x01 \x01(\x02\x12\r\n\x05pos_y\x18\x02 \x01(\x02\x12\r\n\x05pos_z\x18\x03 \x01(\x02\x12\x11\n\tang_vel_x\x18\x04 \x01(\x02\x12\x11\n\tang_vel_y\x18\x05 \x01(\x02\x12\x11\n\tang_vel_z\x18\x06 \x01(\x02\"\x18\n\x16\x43loseConnectionRequest2\xc3\x01\n\x14RobotControlServices\x12/\n\nGetRobotId\x12\x0f.RobotIdRequest\x1a\x10.RobotIdResponse\x12@\n\x0fGetBatteryLevel\x12\x14.BatteryLevelRequest\x1a\x15.BatteryLevelResponse0\x01\x12\x38\n\x10MoveRobotCommand\x12\x0c.MoveCommand\x1a\x12.TelemetryResponse(\x01\x30\x01\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -40,9 +40,13 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_BATTERYLEVELRESPONSE']._serialized_start=99
   _globals['_BATTERYLEVELRESPONSE']._serialized_end=141
   _globals['_MOVECOMMAND']._serialized_start=143
-  _globals['_MOVECOMMAND']._serialized_end=156
-  _globals['_TELEMETRYRESPONSE']._serialized_start=159
-  _globals['_TELEMETRYRESPONSE']._serialized_end=290
-  _globals['_ROBOTCONTROLSERVICES']._serialized_start=293
-  _globals['_ROBOTCONTROLSERVICES']._serialized_end=488
+  _globals['_MOVECOMMAND']._serialized_end=256
+  _globals['_MOVECOMMAND_DIRECTION']._serialized_start=201
+  _globals['_MOVECOMMAND_DIRECTION']._serialized_end=256
+  _globals['_TELEMETRYRESPONSE']._serialized_start=258
+  _globals['_TELEMETRYRESPONSE']._serialized_end=379
+  _globals['_CLOSECONNECTIONREQUEST']._serialized_start=381
+  _globals['_CLOSECONNECTIONREQUEST']._serialized_end=405
+  _globals['_ROBOTCONTROLSERVICES']._serialized_start=408
+  _globals['_ROBOTCONTROLSERVICES']._serialized_end=603
 # @@protoc_insertion_point(module_scope)
