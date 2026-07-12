@@ -55,19 +55,22 @@ class RobotControlServicesServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def GetRobotId(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+        """Request-Response type service
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def GetBatteryLevel(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+        """Uni-directional server streaming service
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def MoveRobotCommand(self, request_iterator, context):
-        """Missing associated documentation comment in .proto file."""
+        """Bi-directional streaming service
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')

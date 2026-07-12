@@ -16,7 +16,6 @@ Status RobotControlService::GetRobotId(
     return Status::OK;
 }
 
-
 Status RobotControlService::GetBatteryLevel(
     ServerContext* context,
     const BatteryLevelRequest* request,
@@ -38,8 +37,6 @@ Status RobotControlService::MoveRobotCommand(
     MoveCommand command;
     while (stream->Read(&command)) {
         TelemetryResponse response;
-
-
         if (command.direction() == MoveCommand::Direction::MoveCommand_Direction_FORWARD)
         {
             std::cout << "Moving Forward" << std::endl;
@@ -78,3 +75,4 @@ Status RobotControlService::MoveRobotCommand(
     }
     return Status::OK;
 }
+

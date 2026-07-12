@@ -1,0 +1,50 @@
+
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "1. Generate Python Protos",
+            "type": "shell",
+            "command": "source grpc_client/venv/bin/activate && python grpc_client/build_protos.py",
+            "problemMatcher": []
+        },
+        {
+            "label": "2. Build C++ Server",
+            "type": "shell",
+            "command": "mkdir -p grpc_server/build && cd grpc_server/build && cmake .. && make -j4",
+            "dependsOn": "1. Generate Python Protos",
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "3. Start C++ Server",
+            "type": "shell",
+            "command": "./grpc_server/build/grpcserver",
+            "isBackground": true,
+            "dependsOn": "2. Build C++ Server",
+            "problemMatcher": []
+        },
+        {
+            "label": "4. Launch Python Dashboard",
+            "type": "shell",
+            "command": "source grpc_client/venv/bin/activate && python grpc_client/client_dashboard.py",
+            "problemMatcher": []
+        }
+    ],
+    "inputs": [],
+    "groups": {},
+    "compositions": [
+        {
+            "label": "Run Full Robot Stack",
+            "type": "shell",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "3. Start C++ Server",
+                "4. Launch Python Dashboard"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
