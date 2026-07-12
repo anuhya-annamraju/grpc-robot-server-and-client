@@ -17,7 +17,7 @@ protobuf_generate(
     TARGET grpcserver
     LANGUAGE cpp
     IMPORT_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/../proto_definitions   
-    PROTOS ${CMAKE_CURRENT_SOURCE_DIR}/../proto_definitions/robot_status.proto
+    PROTOS ${CMAKE_CURRENT_SOURCE_DIR}/../proto_definitions/robot_control_api.proto
 )
 
 protobuf_generate(
@@ -27,7 +27,7 @@ protobuf_generate(
     # FIXED: Changed from gRPC_CPP_PLUGIN_EXECUTABLE to GRPC_CPP_PLUGIN_EXE
     PLUGIN "protoc-gen-grpc=${GRPC_CPP_PLUGIN_EXE}"
     IMPORT_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/../proto_definitions   
-    PROTOS ${CMAKE_CURRENT_SOURCE_DIR}/../proto_definitions/robot_status.proto
+    PROTOS ${CMAKE_CURRENT_SOURCE_DIR}/../proto_definitions/robot_control_api.proto
 )
 
 target_link_libraries(grpcserver PRIVATE protobuf::libprotobuf gRPC::grpc++)

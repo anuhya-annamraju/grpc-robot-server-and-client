@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+service RobotControlService {
+    
+    rpc GetRobotId(RobotIdRequest) returns (RobotIdResponse);
+
+    rpc GetBatteryLevel(BatteryLevelRequest) returns (stream BatteryLevelResponse);
+
+    rpc MoveRobotCommand(stream MoveCommand) returns (stream TelemetryResponse);
+    
+    }
+
+
+// Request-Response type messages
+message RobotIdRequest{}
+message RobotIdResponse 
+{
+    string id = 1;
+}
+
+// Uni-directional server streaming message
+message BatteryLevelRequest{}
+message BatteryLevelResponse{
+    uint32 percentage = 1;
+}
+
+
+// Bi-directional streaming message
+message MoveCommand {}
+message TelemetryResponse {
+    float latitude = 1;
+    float longitude = 2;
+    float altitude = 3;
+    float ang_vel_x = 4;
+    float ang_vel_y = 5;
+    float ang_vel_z = 6;
+}
