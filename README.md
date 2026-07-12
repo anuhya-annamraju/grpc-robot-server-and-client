@@ -1,4 +1,5 @@
-# grpc server client prototype
+# gRPC Server-Client prototype
+![alt text](<Screenshot 2026-07-12 at 17.51.33.png>)
 This mono repo can launch a c++ based gRPC server app and a python based gRPC client app.
 
 The server represents a cpp app that handles sensor data of the robot.
@@ -45,7 +46,7 @@ The API offers 3 basic services for a robotoc application.
     - press Ctrl*Shift+P or Cmd+Shift+P and then select Run>Tasks from the drop down and then select "1. Generate Python Protos" option. 
     - To launch it, press Ctrl*Shift+P or Cmd+Shift+P and then select Run>Tasks from the drop down and then select "4. Launch Python Dashboard" option.
 
-![alt text](<Screenshot 2026-07-12 at 17.51.33.png>)
+
 
  
 
