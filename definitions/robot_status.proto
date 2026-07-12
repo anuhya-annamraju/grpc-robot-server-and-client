@@ -1,7 +1,14 @@
 syntax = "proto3";
-message robot_status
+message RobotStatus
 {
     uint32 robotSerialId = 1;
     float latitude = 2;
     bool isMoving = 3;
 }
+message RobotStatusRequest
+{
+    bool send_status = 1;
+}
+
+service RobotStatusService {
+    rpc GetRobotStatus(RobotStatusRequest) returns (stream RobotStatus);}
