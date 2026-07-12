@@ -1,1 +1,3 @@
 build/*
+grpc_client/__pycache__/*
+grpc_client/venv/*

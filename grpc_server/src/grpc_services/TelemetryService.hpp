@@ -1,8 +1,8 @@
 #pragma once
 
 #include <grpcpp/grpcpp.h>
-// Include the generated gRPC header
-#include "proto_definitions/robot_status.grpc.pb.h"
+// Include the generated gRPC header from the build directory
+#include "robot_status.grpc.pb.h"
 
 class TelemetryService final : public RobotStatusService::Service {
 public:
