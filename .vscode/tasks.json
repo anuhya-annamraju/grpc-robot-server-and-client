@@ -5,7 +5,7 @@
         {
             "label": "1. Generate Python Protos",
             "type": "shell",
-            "command": "source grpc_client/venv/bin/activate && python grpc_client/build_protos.py",
+            "command": "source grpc_client/venv/bin/activate && pip install -r grpc_client/requirements.txt && python grpc_client/build_protos.py",
             "problemMatcher": []
         },
         {
