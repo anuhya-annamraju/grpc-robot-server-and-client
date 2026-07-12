@@ -3,14 +3,14 @@
 #include <string>
 
 // Include your custom service header
-#include "grpc_services/TelemetryService.hpp"
+#include "grpc_services/RobotControlService.hpp"
 
 void RunServer() {
     // Listen on port 50051 on all local network interfaces
     std::string server_address("0.0.0.0:50051");
     
     // Instantiate your custom service class
-    TelemetryService service;
+    RobotControlService service;
 
     grpc::ServerBuilder builder;
     

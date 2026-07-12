@@ -1,4 +1,4 @@
-#include "TelemetryService.hpp"
+#include "RobotControlService.hpp"
 #include <chrono>
 #include <iostream>
 #include <thread>
@@ -7,7 +7,7 @@ using grpc::ServerContext;
 using grpc::ServerWriter;
 using grpc::Status;
 
-Status TelemetryService::GetRobotId(
+Status RobotControlService::GetRobotId(
     ServerContext* context,
     const RobotIdRequest* request,
     RobotIdResponse* response
@@ -17,7 +17,7 @@ Status TelemetryService::GetRobotId(
 }
 
 
-Status TelemetryService::GetBatteryLevel(
+Status RobotControlService::GetBatteryLevel(
     ServerContext* context,
     const BatteryLevelRequest* request,
     ServerWriter<BatteryLevelResponse>* writer
@@ -31,7 +31,7 @@ Status TelemetryService::GetBatteryLevel(
     return Status::OK;
 }
 
-Status TelemetryService::MoveRobotCommand(
+Status RobotControlService::MoveRobotCommand(
     ServerContext* context,
     grpc::ServerReaderWriter<TelemetryResponse, MoveCommand>* stream
 ) {

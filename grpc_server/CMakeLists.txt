@@ -4,8 +4,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 project(grpcserver VERSION 1.0)
 add_executable(grpcserver src/main.cpp
-    src/grpc_services/TelemetryService.hpp
-    src/grpc_services/TelemetryService.cpp
+    src/grpc_services/RobotControlService.hpp
+    src/grpc_services/RobotControlService.cpp
 )
 
 find_package(protobuf REQUIRED CONFIG)

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-service RobotControlService {
+service RobotControlServices {
     
     rpc GetRobotId(RobotIdRequest) returns (RobotIdResponse);
 
@@ -24,7 +24,6 @@ message BatteryLevelResponse{
     uint32 percentage = 1;
 }
 
-
 // Bi-directional streaming message
 message MoveCommand {}
 message TelemetryResponse {
@@ -35,3 +34,6 @@ message TelemetryResponse {
     float ang_vel_y = 5;
     float ang_vel_z = 6;
 }
+
+
+message CloseConnectionRequest {}
