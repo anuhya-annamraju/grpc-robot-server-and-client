@@ -26,7 +26,7 @@ Status RobotControlService::GetBatteryLevel(
         BatteryLevelResponse response;
         response.set_percentage(100 - i * 10); // Simulate battery drain
         writer->Write(response);
-        std::this_thread::sleep_for(std::chrono::seconds(1)); // Simulate delay
+        std::this_thread::sleep_for(std::chrono::minutes(1)); // Simulate delay
     }
     return Status::OK;
 }
@@ -40,25 +40,25 @@ Status RobotControlService::MoveRobotCommand(
         TelemetryResponse response;
 
 
-        if(command.direction() == MoveCommand::Direction::MoveCommand_Direction_FORWARD)
+        if (command.direction() == MoveCommand::Direction::MoveCommand_Direction_FORWARD)
         {
             std::cout << "Moving Forward" << std::endl;
-            pos[0] -= 0.1; // Move position in x-direction   
+            pos[1] += 0.1; // move forward along +Y
         }
-        else if(command.direction() == MoveCommand::Direction::MoveCommand_Direction_LEFT)
+        else if (command.direction() == MoveCommand::Direction::MoveCommand_Direction_LEFT)
         {
             std::cout << "Moving Left" << std::endl;
-            pos[1] += 0.1; // Move position in y-direction
+            pos[0] -= 0.1; // move left along -X
         }
-        else if(command.direction() == MoveCommand::Direction::MoveCommand_Direction_RIGHT)
+        else if (command.direction() == MoveCommand::Direction::MoveCommand_Direction_RIGHT)
         {
             std::cout << "Moving Right" << std::endl;
-            pos[0] += 0.1; // Move position in x-direction
+            pos[0] += 0.1; // move right along +X
         }
         else if (command.direction() == MoveCommand::Direction::MoveCommand_Direction_BACK)
         {
             std::cout << "Moving Back" << std::endl;
-            pos[1] -= 0.1; // Move position in y-direction
+            pos[1] -= 0.1; // move backward along -Y
         }
         else
         {
