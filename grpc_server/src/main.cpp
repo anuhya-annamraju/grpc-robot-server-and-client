@@ -1,13 +1,25 @@
 #include <iostream>
 #include <memory>
 #include <string>
-
-// Include your custom service header
+#include <csignal>
+#include <thread>
 #include "grpc_services/RobotControlService.hpp"
 
+
+std::atomic<bool> keep_server_running(true);
+void terminate_server(int signal_num)
+{
+    if(signal_num == SIGINT)
+    {
+        std::cout << "SIGINT received. Terminating server..." << std::endl;
+        keep_server_running = false;
+        exit(0);
+    }
+}
+
 void RunServer() {
-    // Listen on port 50051 on all local network interfaces
-    std::string server_address("0.0.0.0:50051");
+    // Listen on port 12345 on all local network interfaces
+    std::string server_address("0.0.0.0:12345");
     
     // Instantiate your custom service class
     RobotControlService service;
@@ -24,11 +36,15 @@ void RunServer() {
     std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
     std::cout << "gRPC Robot Server listening on " << server_address << std::endl;
 
-    // Keep the application running and listening indefinitely
-    server->Wait();
+    while (keep_server_running) {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+
 }
 
 int main() {
+
+    std::signal(SIGINT, terminate_server); 
     RunServer();
     return 0;
 }

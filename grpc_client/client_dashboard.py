@@ -2,7 +2,6 @@ import os
 import sys
 import queue
 import threading
-import matplotlib
 
 # Prefer a non-Tkinter backend on macOS, then Qt-based backends.
 for backend in ["MacOSX", "Qt5Agg", "QtAgg"]:
@@ -14,7 +13,7 @@ for backend in ["MacOSX", "Qt5Agg", "QtAgg"]:
 
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
-from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
+from mpl_toolkits.mplot3d import Axes3D  
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "generated")))
 
@@ -35,7 +34,7 @@ class RobotDashboard:
         self.status_text = "Status: Ready"
         self.robot_id = "Robot ID: --"
         self.battery_text = "Battery: -- %"
-        self.channel = grpc.insecure_channel("127.0.0.1:50051")
+        self.channel = grpc.insecure_channel("127.0.0.1:12345")
         self.stub = robot_control_api_pb2_grpc.RobotControlServicesStub(self.channel)
         self.command_queue = queue.Queue()
         self.telemetry_thread = None
@@ -44,7 +43,7 @@ class RobotDashboard:
         self._start_background_tasks()
 
     def _build_ui(self):
-        self.fig = plt.figure(figsize=(11, 6), constrained_layout=True)
+        self.fig = plt.figure(figsize=(11, 6), tight_layout=True)
         gs = self.fig.add_gridspec(6, 4)
 
         self.ax_plot = self.fig.add_subplot(gs[:, :3], projection="3d")
