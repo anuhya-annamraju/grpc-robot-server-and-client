@@ -7,6 +7,7 @@ using grpc::ServerContext;
 using grpc::ServerWriter;
 using grpc::Status;
 
+
 Status RobotControlService::GetRobotId(
     ServerContext* context,
     const RobotIdRequest* request,
@@ -21,12 +22,9 @@ Status RobotControlService::GetBatteryLevel(
     const BatteryLevelRequest* request,
     ServerWriter<BatteryLevelResponse>* writer
 ) {
-    for (int i = 0; i < 5; ++i) {
-        BatteryLevelResponse response;
-        response.set_percentage(100 - i * 10); // Simulate battery drain
-        writer->Write(response);
-        std::this_thread::sleep_for(std::chrono::minutes(1)); // Simulate delay
-    }
+    BatteryLevelResponse response;
+    response.set_percentage(_robotController.GetBatteryLevel());
+    writer->Write(response);
     return Status::OK;
 }
 
@@ -35,43 +33,21 @@ Status RobotControlService::MoveRobotCommand(
     grpc::ServerReaderWriter<TelemetryResponse, MoveCommand>* stream
 ) {
     MoveCommand command;
-    while (stream->Read(&command)) {
-        TelemetryResponse response;
-        if (command.direction() == MoveCommand::Direction::MoveCommand_Direction_FORWARD)
-        {
-            std::cout << "Moving Forward" << std::endl;
-            pos[1] += 0.1; // move forward along +Y
-        }
-        else if (command.direction() == MoveCommand::Direction::MoveCommand_Direction_LEFT)
-        {
-            std::cout << "Moving Left" << std::endl;
-            pos[0] -= 0.1; // move left along -X
-        }
-        else if (command.direction() == MoveCommand::Direction::MoveCommand_Direction_RIGHT)
-        {
-            std::cout << "Moving Right" << std::endl;
-            pos[0] += 0.1; // move right along +X
-        }
-        else if (command.direction() == MoveCommand::Direction::MoveCommand_Direction_BACK)
-        {
-            std::cout << "Moving Back" << std::endl;
-            pos[1] -= 0.1; // move backward along -Y
-        }
-        else
-        {
-            std::cout << "Unknown Direction" << std::endl;
-        }
-        response.set_pos_x(pos[0]);
-        response.set_pos_y(pos[1]);
-        response.set_pos_z(pos[2]);
-
-        response.set_ang_vel_x(angVel[0]);
-        response.set_ang_vel_y(angVel[1]);
-        response.set_ang_vel_z(angVel[2]);
-
-        stream->Write(response);
-        std::this_thread::sleep_for(std::chrono::milliseconds(10)); // 100 Hz update rate 
-
+    switch (command.direction()) {
+        case MoveCommand::FORWARD:
+            _robotController.MoveRobotCommand(RobotController::MoveRobotCommand::FORWARD);
+            break;
+        case MoveCommand::BACK:
+            _robotController.MoveRobotCommand(RobotController::MoveRobotCommand::BACK);
+            break;
+        case MoveCommand::LEFT:
+            _robotController.MoveRobotCommand(RobotController::MoveRobotCommand::LEFT);
+            break;
+        case MoveCommand::RIGHT:
+            _robotController.MoveRobotCommand(RobotController::MoveRobotCommand::RIGHT);
+            break;
+        default:
+        break;
     }
     return Status::OK;
 }
