@@ -39,6 +39,7 @@ class RobotControlInterface {
     std::string GetRobotId(){return _robotSpecs.robotId;};
     float GetBatteryLevel(){return _robotState.batteryLevel;};
     void SetMoveCommand(const MoveRobotCommand& command){_moveCommand = command;};
+    RobotState GetTelemetryData(){ParseRobotState(); return _robotState;};
 
     private:
 

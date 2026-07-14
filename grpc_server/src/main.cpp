@@ -22,24 +22,24 @@ void RunServer() {
     std::string server_address("0.0.0.0:12345");
     
     // Instantiate your custom service class
-    std::unique_ptr<RobotController> robotController= std::make_unique<RobotController>();
-    std::unique_ptr<RobotControlService> service = std::make_unique<RobotControlService>(robotController);
+    std::unique_ptr<RobotControlInterface> robotController= std::make_unique<RobotControlInterface>();
+    std::unique_ptr<RobotControlService> service = std::make_unique<RobotControlService>(std::move(robotController));
 
     std::unique_ptr<grpc::ServerBuilder> builder = std::make_unique<grpc::ServerBuilder>();
     
     // Set up the socket address with insecure credentials (no SSL for local testing)
     builder->AddListeningPort(server_address, grpc::InsecureServerCredentials());
     
-    // Register your service instance
-    builder.RegisterService(service);
+    // // Register your service instance
+    // builder->RegisterService(service);
 
-    // Assemble and boot up the server process
-    std::unique_ptr<grpc::Server> server(builder->BuildAndStart());
-    std::cout << "gRPC Robot Server listening on " << server_address << std::endl;
+    // // Assemble and boot up the server process
+    // std::unique_ptr<grpc::Server> server(builder->BuildAndStart());
+    // std::cout << "gRPC Robot Server listening on " << server_address << std::endl;
 
-    while (keep_server_running) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-    }
+    // while (keep_server_running) {
+    //     std::this_thread::sleep_for(std::chrono::seconds(1));
+    // }
 
 }
 

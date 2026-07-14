@@ -12,5 +12,9 @@ public:
     grpc::Status MoveRobotCommand(grpc::ServerContext* context, grpc::ServerReaderWriter<TelemetryResponse, MoveCommand>* stream) override ;
 private:
 std::unique_ptr<RobotControlInterface> _robotController;
+TelemetryResponse _telemetryResponse;
+
+void ParseTelemetryData();
+
 };
 

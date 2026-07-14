@@ -18,6 +18,23 @@ void RobotControlInterface::ParseRobotSpecs() {
 void RobotControlInterface::ParseRobotState() {
     // Parse the robot state from the serial data received from the robot
     // Update the robotState struct with the parsed data
+
+    switch (_moveCommand.direction) {
+        case FORWARD:
+            _robotState.pos[0] += _moveCommand.speed;
+            break;
+        case BACK:
+            _robotState.pos[0] -= _moveCommand.speed;
+            break;
+        case LEFT:
+            _robotState.pos[1] -= _moveCommand.speed;
+            break;
+        case RIGHT:
+            _robotState.pos[1] += _moveCommand.speed;
+            break;
+        default:
+            break;
+    }
 }
 
 void RobotControlInterface::ParseBatteryLevel() {

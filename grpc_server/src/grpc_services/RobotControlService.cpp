@@ -54,6 +54,20 @@ Status RobotControlService::MoveRobotCommand(
         }
         moveCommand.speed = 1.0;
         _robotController->SetMoveCommand(moveCommand);
+        stream->Write(_telemetryResponse);
+    }  
     return Status::OK;
 }
 
+
+RobotControlService::~RobotControlService() {}
+
+void RobotControlService::ParseTelemetryData() {
+    RobotControlInterface::RobotState robotState = _robotController->GetTelemetryData();
+    _telemetryResponse.set_ang_vel_x(robotState.angVel[0]);
+    _telemetryResponse.set_ang_vel_y(robotState.angVel[1]);
+    _telemetryResponse.set_ang_vel_z(robotState.angVel[2]);
+    _telemetryResponse.set_pos_x(robotState.pos[0]);
+    _telemetryResponse.set_pos_y(robotState.pos[1]);
+    _telemetryResponse.set_pos_z(robotState.pos[2]);
+}
