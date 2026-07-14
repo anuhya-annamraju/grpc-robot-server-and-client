@@ -1,26 +1,26 @@
-#include "RobotController.hpp"
+#include "RobotControlInterface.hpp"
 #include <thread>
 
-RobotController::RobotController() {
+RobotControlInterface::RobotControlInterface() {
     ParseRobotSpecs();
 }
 
-RobotController::~RobotController() {
+RobotControlInterface::~RobotControlInterface() {
     
 }
-void RobotController::ParseRobotSpecs() {
+void RobotControlInterface::ParseRobotSpecs() {
     // Parse the robot specifications from the serial data received from the robot
     // Update the robotSpecs struct with the parsed data
     _robotSpecs.robotId = "102";
     _robotSpecs.lifespan_hours = 10.0;
 }
 
-void RobotController::ParseRobotState() {
+void RobotControlInterface::ParseRobotState() {
     // Parse the robot state from the serial data received from the robot
     // Update the robotState struct with the parsed data
 }
 
-void RobotController::ParseBatteryLevel() {
+void RobotControlInterface::ParseBatteryLevel() {
     // Parse the battery level from the serial data received from the robot
     // Update the robotState struct with the parsed data
     // Simulate battery level
@@ -29,9 +29,5 @@ void RobotController::ParseBatteryLevel() {
         std::this_thread::sleep_for(std::chrono::minutes(1)); // Simulate delay
     }
 }
-void RobotController::MoveRobotCommand(const MoveRobotCommand& command) {
 
-    // RobotController reads the serial data from the robot and parses the move command
-    // Move the robot based on the command received
-    
-}
+

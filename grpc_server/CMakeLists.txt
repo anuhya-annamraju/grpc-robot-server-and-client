@@ -8,7 +8,7 @@ project(grpcserver VERSION 1.0)
 
 add_executable(grpcserver src/main.cpp
     src/grpc_services/RobotControlService.cpp
-    src/robot_control/RobotController.cpp
+    src/robot_control/RobotControlInterface.cpp
 )
 
 find_package(protobuf REQUIRED CONFIG)

@@ -3,7 +3,7 @@
 
 
 
-class RobotController {
+class RobotControlInterface {
 
     public :
     struct RobotSpecs
@@ -19,19 +19,26 @@ class RobotController {
         float angVel[3];
     };
 
-    enum MoveRobotCommand
+    enum Direction
     {
             FORWARD,
             BACK,
             LEFT,
             RIGHT
     };
-    RobotController();
-    ~RobotController();
+
+    struct MoveRobotCommand
+    {
+        Direction direction;
+        float speed;
+    };
+
+    RobotControlInterface();
+    ~RobotControlInterface();
 
     std::string GetRobotId(){return _robotSpecs.robotId;};
     float GetBatteryLevel(){return _robotState.batteryLevel;};
-    void MoveRobotCommand(const MoveRobotCommand& command);
+    void SetMoveCommand(const MoveRobotCommand& command){_moveCommand = command;};
 
     private:
 
@@ -40,5 +47,6 @@ class RobotController {
     void ParseBatteryLevel();
     RobotSpecs _robotSpecs;
     RobotState _robotState;
+    MoveRobotCommand _moveCommand;
 
 };

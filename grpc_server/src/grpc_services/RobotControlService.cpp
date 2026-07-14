@@ -23,7 +23,7 @@ Status RobotControlService::GetBatteryLevel(
     ServerWriter<BatteryLevelResponse>* writer
 ) {
     BatteryLevelResponse response;
-    response.set_percentage(_robotController.GetBatteryLevel());
+    response.set_percentage(_robotController->GetBatteryLevel());
     writer->Write(response);
     return Status::OK;
 }
@@ -33,22 +33,27 @@ Status RobotControlService::MoveRobotCommand(
     grpc::ServerReaderWriter<TelemetryResponse, MoveCommand>* stream
 ) {
     MoveCommand command;
-    switch (command.direction()) {
-        case MoveCommand::FORWARD:
-            _robotController.MoveRobotCommand(RobotController::MoveRobotCommand::FORWARD);
-            break;
-        case MoveCommand::BACK:
-            _robotController.MoveRobotCommand(RobotController::MoveRobotCommand::BACK);
-            break;
-        case MoveCommand::LEFT:
-            _robotController.MoveRobotCommand(RobotController::MoveRobotCommand::LEFT);
-            break;
-        case MoveCommand::RIGHT:
-            _robotController.MoveRobotCommand(RobotController::MoveRobotCommand::RIGHT);
-            break;
-        default:
-        break;
-    }
+    while (stream->Read(&command)) {
+        RobotControlInterface::MoveRobotCommand moveCommand;
+        switch (command.direction()) {
+            case MoveCommand::FORWARD:
+                moveCommand.direction = RobotControlInterface::FORWARD;
+                break;
+            case MoveCommand::BACK:
+                moveCommand.direction = RobotControlInterface::BACK;
+                break;
+            case MoveCommand::LEFT:
+                moveCommand.direction = RobotControlInterface::LEFT;
+                break;
+            case MoveCommand::RIGHT:
+                moveCommand.direction = RobotControlInterface::RIGHT;
+                break;
+                default:
+                moveCommand.direction = RobotControlInterface::FORWARD;
+                break;
+        }
+        moveCommand.speed = 1.0;
+        _robotController->SetMoveCommand(moveCommand);
     return Status::OK;
 }
 
