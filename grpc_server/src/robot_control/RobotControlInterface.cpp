@@ -1,5 +1,4 @@
 #include "RobotControlInterface.hpp"
-#include <thread>
 
 
 RobotControlInterface::RobotControlInterface(asio::io_context& io_context) {
@@ -32,7 +31,7 @@ void RobotControlInterface::ParseRobotSpecs() {
 
 void RobotControlInterface::ParseRobotState() {
     // Parse the robot state from the serial data received from the robot
-    // Update the robotState struct with the parsed data
+    // Update the robotState struct with the parsed data at 100 Hz freq
     switch (_moveCommand.direction) {
         case FORWARD:
             _robotState.pos[0] += _moveCommand.speed;

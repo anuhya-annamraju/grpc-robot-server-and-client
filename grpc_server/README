@@ -1,0 +1,55 @@
+# gRPC Robot Control Server
+
+A modern C++ gRPC server for robot control with bi-directional streaming capabilities.
+
+## Clean Code Practices
+
+### Architecture & Design Patterns
+- **Separation of Concerns**: Clear separation between gRPC service layer (`RobotControlService`) and business logic (`RobotControlInterface`)
+- **Dependency Injection**: Service receives dependencies via constructor, promoting loose coupling
+- **Interface-based Design**: Abstract interfaces enable flexibility and testability
+
+### Memory Management
+- **Smart Pointers**: Using `std::unique_ptr` and `std::shared_ptr` for automatic memory management
+- **Move Semantics**: Efficient resource transfer with `std::move()`
+- **RAII Pattern**: Proper resource acquisition and cleanup in constructors/destructors
+
+### Code Quality
+- **Single Responsibility Principle**: Each class has one clear purpose
+- **Descriptive Naming**: Clear, meaningful names for classes, methods, and variables
+- **Const Correctness**: Proper use of `const` for read-only parameters and methods
+- **Private Encapsulation**: Public interfaces separated from private implementation
+
+### Error Handling
+- **Graceful Shutdown**: Signal handling (SIGINT) with proper cleanup procedures
+- **Status Codes**: gRPC Status returns for proper RPC error communication
+- **Resource Cleanup**: Explicit destructor implementations for resource release
+
+### Proto Definitions
+- **Well-Structured Messages**: Clear message definitions with logical grouping
+- **Documentation**: Comments explaining services and message purposes
+- **Versioning Support**: Proto3 syntax for forward/backward compatibility
+
+### Communication Patterns
+- **Streaming Architecture**: Efficient bi-directional streaming for real-time robot control
+- **Telemetry Pattern**: Separation of command inputs from telemetry outputs
+- **Request-Response Types**: Multiple RPC patterns (unary, server streaming, bi-directional)
+
+## Project Structure
+```
+src/
+  ├── main.cpp                    # Server entry point with signal handling
+  ├── grpc_services/
+  │   ├── RobotControlService.hpp # gRPC service interface
+  │   └── RobotControlService.cpp # gRPC service implementation
+  └── robot_control/
+      ├── RobotControlInterface.hpp # Robot control abstraction
+      └── RobotControlInterface.cpp # Robot control implementation
+```
+
+## TODO
+- [ ] Unit tests for service methods
+- [ ] Integration tests for streaming RPCs
+- [ ] Test coverage reporting
+- [ ] Mock RobotControlInterface for testing
+- [ ] CI/CD pipeline integration
