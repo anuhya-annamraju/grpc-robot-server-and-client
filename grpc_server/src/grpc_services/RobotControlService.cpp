@@ -54,6 +54,7 @@ Status RobotControlService::MoveRobotCommand(
         }
         moveCommand.speed = 1.0;
         _robotController->SetMoveCommand(moveCommand);
+        ParseTelemetryData();
         stream->Write(_telemetryResponse);
     }  
     return Status::OK;

@@ -4,6 +4,7 @@
 #include <csignal>
 #include <thread>
 #include "grpc_services/RobotControlService.hpp"
+#include <asio.hpp>
 
 
 std::atomic<bool> keep_server_running(true);
@@ -22,7 +23,8 @@ void RunServer() {
     std::string server_address("0.0.0.0:12345");
     
     // Instantiate your custom service class
-    std::unique_ptr<RobotControlInterface> robotController= std::make_unique<RobotControlInterface>();
+    auto io_context = std::make_shared<asio::io_context>();
+    std::unique_ptr<RobotControlInterface> robotController= std::make_unique<RobotControlInterface>(*io_context);
     std::unique_ptr<RobotControlService> service = std::make_unique<RobotControlService>(std::move(robotController));
 
     std::unique_ptr<grpc::ServerBuilder> builder = std::make_unique<grpc::ServerBuilder>();

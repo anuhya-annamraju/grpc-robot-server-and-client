@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
-
-
+#include <asio.hpp>
 
 class RobotControlInterface {
 
@@ -33,7 +32,7 @@ class RobotControlInterface {
         float speed;
     };
 
-    RobotControlInterface();
+    RobotControlInterface(asio::io_context& io_context);
     ~RobotControlInterface();
 
     std::string GetRobotId(){return _robotSpecs.robotId;};
@@ -46,8 +45,12 @@ class RobotControlInterface {
     void ParseRobotState();
     void ParseRobotSpecs();
     void ParseBatteryLevel();
+    void StartParsingState();
     RobotSpecs _robotSpecs;
     RobotState _robotState;
     MoveRobotCommand _moveCommand;
+
+    asio::steady_timer* _parseTimer;
+    std::chrono::milliseconds _parseInterval{10}; // 100 Hz freq
 
 };
