@@ -25,6 +25,8 @@ The API offers 3 basic services for a robotoc application.
 
 # How to launch the server 
 
+This repo was developed and tested on MAC, so it is recommended to use that for ease of use. 
+
 ## Prerequisites (All Platforms)
 - CMake 3.10+
 - C++17 compatible compiler
