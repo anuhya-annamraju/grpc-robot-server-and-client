@@ -69,17 +69,17 @@ class RobotDashboard:
         self.ax_status.axis("off")
         self.ax_status.set_position([0.8, 0.8, 0.2, 0.2])
         self.status_text_obj = self.ax_status.text(
-            0.0,
-            0.85,
+            1.0,
+            1.0,
             self.status_text,
             transform=self.ax_status.transAxes,
             fontsize=12,
             va="top",
             bbox={"boxstyle": "round,pad=0.45", "facecolor": "#f7f7f7", "edgecolor": "#cccccc"},
         )
-        self.robot_id_text_obj = self.ax_status.text(0.0, 0.62, self.robot_id, transform=self.ax_status.transAxes, fontsize=11)
-        self.battery_text_obj = self.ax_status.text(0.0, 0.48, self.battery_text, transform=self.ax_status.transAxes, fontsize=11)
-        self.ax_status.text(0.0, 0.34, "Telemetry: waiting", transform=self.ax_status.transAxes, fontsize=11)
+        self.robot_id_text_obj = self.ax_status.text(0.0, 0.55, self.robot_id, transform=self.ax_status.transAxes, fontsize=11)
+        self.battery_text_obj = self.ax_status.text(0.0, 0.32, self.battery_text, transform=self.ax_status.transAxes, fontsize=11)
+       # self.ax_status.text(0.0, 0.34, "Telemetry: waiting", transform=self.ax_status.transAxes, fontsize=11)
 
         button_kwargs = {"color": "#dddddd", "hovercolor": "#bbbbbb"}
         self.btn_forward = Button(self.ax_button_forward, "Forward ⬆", **button_kwargs)
