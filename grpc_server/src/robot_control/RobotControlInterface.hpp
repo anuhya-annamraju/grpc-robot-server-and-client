@@ -13,7 +13,7 @@ class RobotControlInterface {
 
     struct RobotState
     {
-        float batteryLevel;
+        float batteryLevel = 100.0f;
         float pos[3];
         float angVel[3];
     };

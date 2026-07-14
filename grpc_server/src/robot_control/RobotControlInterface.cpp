@@ -49,16 +49,9 @@ void RobotControlInterface::ParseRobotState() {
         default:
             break;
     }
+
+    _robotState.batteryLevel = std::max(0.0f, _robotState.batteryLevel - 0.01f); // Simulate battery drain
 }
 
-void RobotControlInterface::ParseBatteryLevel() {
-    // Parse the battery level from the serial data received from the robot
-    // Update the robotState struct with the parsed data
-    // Simulate battery level
-    for (int i = 0; i < 5; ++i) {
-        _robotState.batteryLevel = 100 - i * 10; // Simulate battery drain
-        std::this_thread::sleep_for(std::chrono::minutes(1)); // Simulate delay
-    }
-}
 
 
