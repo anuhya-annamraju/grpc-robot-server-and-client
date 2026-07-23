@@ -28,7 +28,7 @@ jobs:
           python -m grpc_tools.protoc \
             -I.. \
             --python_out=. \
-            --grpc_python_out=. \
+            --grpc_python_out=generated \
             ../proto_definitions/robot_control_api.proto
 
       - name: Build wheel and source distribution

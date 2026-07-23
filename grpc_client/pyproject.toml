@@ -9,3 +9,8 @@ dependencies = [
     "grpcio>=1.50.0",
     "protobuf>=4.21.0",
 ]
+
+# Explicitly discover only the generated package folder
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["generated*"]
