@@ -1,7 +1,6 @@
 name: Build C++ Project
 
 on: push
-
 jobs:
   compile-job:
     runs-on: ubuntu-latest
@@ -17,12 +16,18 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
+            build-essential \
+            cmake \
+            pkg-config \
             libprotobuf-dev \
             protobuf-compiler \
             libgrpc++-dev \
             protobuf-compiler-grpc
       - name: Configure CMake
-        run: cmake -S . -B build -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=OFF
+        run: |
+          cmake -S . -B build \
+            -DCMAKE_PREFIX_PATH="/usr;/usr/lib/x86_64-linux-gnu" \
+            -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON
 
       - name: Build project
         run: cmake --build build
