@@ -1,22 +1,21 @@
 #include "RobotControlInterface.hpp"
 
 
-RobotControlInterface::RobotControlInterface(asio::io_context& io_context) {
+RobotControlInterface::RobotControlInterface(asio::io_context& io_context)
+    : _parseTimer(io_context, _parseInterval) {
     ParseRobotSpecs();
-    _parseTimer = new asio::steady_timer(io_context, _parseInterval);
-
 }
 
 RobotControlInterface::~RobotControlInterface() {
-    _parseTimer->cancel();
+    _parseTimer.cancel();
 }
 
 void RobotControlInterface::StartParsingState() {
 
-    _parseTimer->async_wait([this](const asio::error_code& error) {
+    _parseTimer.async_wait([this](const asio::error_code& error) {
         if (!error) {
             ParseRobotState();
-            _parseTimer->expires_after(_parseInterval);
+            _parseTimer.expires_after(_parseInterval);
             StartParsingState();
         }
     });

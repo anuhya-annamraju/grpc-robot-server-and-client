@@ -50,7 +50,7 @@ class RobotControlInterface {
     RobotState _robotState;
     MoveRobotCommand _moveCommand;
 
-    asio::steady_timer* _parseTimer;
     std::chrono::milliseconds _parseInterval{10}; // 100 Hz freq
+    asio::steady_timer _parseTimer; // To avoid handling deletion manually, RAII is used to manage the timer's lifetime. The timer will be automatically canceled when the RobotControlInterface object is destroyed.
 
 };
