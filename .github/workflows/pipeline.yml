@@ -20,15 +20,54 @@ jobs:
             cmake \
             pkg-config \
             libprotobuf-dev \
+            libprotoc-dev \
             protobuf-compiler \
+            libgrpc-dev \
             libgrpc++-dev \
-            protobuf-compiler-grpc
+            protobuf-compiler-grpc \
+            libabsl-dev
+
+      - name: Create CMake package shims
+        run: |
+          mkdir -p .ci/cmake/protobuf .ci/cmake/grpc
+
+          cat > .ci/cmake/protobuf/protobufConfig.cmake <<'EOF'
+          set(Protobuf_FOUND TRUE)
+          find_path(PROTOBUF_INCLUDE_DIR NAMES google/protobuf/message.h REQUIRED)
+          find_library(PROTOBUF_LIBRARY NAMES protobuf REQUIRED)
+          set(PROTOBUF_INCLUDE_DIRS "${PROTOBUF_INCLUDE_DIR}")
+          set(PROTOBUF_LIBRARIES "${PROTOBUF_LIBRARY}")
+          set(PROTOBUF_LIBRARY "${PROTOBUF_LIBRARY}")
+          set(PROTOBUF_PROTOC_EXECUTABLE "/usr/bin/protoc")
+
+          add_library(protobuf::libprotobuf UNKNOWN IMPORTED)
+          set_target_properties(protobuf::libprotobuf PROPERTIES
+            IMPORTED_LOCATION "${PROTOBUF_LIBRARY}"
+            INTERFACE_INCLUDE_DIRECTORIES "${PROTOBUF_INCLUDE_DIRS}")
+
+          include(FindProtobuf)
+          EOF
+
+          cat > .ci/cmake/grpc/gRPCConfig.cmake <<'EOF'
+          set(gRPC_FOUND TRUE)
+          find_path(GRPC_INCLUDE_DIR NAMES grpc++/grpc++.h REQUIRED)
+          find_library(GRPC_LIBRARY NAMES grpc++ REQUIRED)
+          set(gRPC_INCLUDE_DIRS "${GRPC_INCLUDE_DIR}")
+          set(gRPC_LIBRARIES "${GRPC_LIBRARY}")
+          set(gRPC_LIBRARY "${GRPC_LIBRARY}")
+
+          add_library(gRPC::grpc++ UNKNOWN IMPORTED)
+          set_target_properties(gRPC::grpc++ PROPERTIES
+            IMPORTED_LOCATION "${GRPC_LIBRARY}"
+            INTERFACE_INCLUDE_DIRECTORIES "${gRPC_INCLUDE_DIRS}")
+          EOF
+
       - name: Configure CMake
         run: |
           cmake -S . -B build \
-            -Dprotobuf_DIR="/usr/lib/x86_64-linux-gnu/cmake/protobuf" \
-            -DgRPC_DIR="/usr/lib/x86_64-linux-gnu/cmake/grpc" \
-            -DCMAKE_PREFIX_PATH="/usr;/usr/lib/x86_64-linux-gnu" \
+            -Dprotobuf_DIR="$PWD/.ci/cmake/protobuf" \
+            -DgRPC_DIR="$PWD/.ci/cmake/grpc" \
+            -DCMAKE_PREFIX_PATH="$PWD/.ci/cmake;/usr;/usr/lib/x86_64-linux-gnu" \
             -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON
 
       - name: Build project
