@@ -18,9 +18,18 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
+     
+      - name: Install build and gRPC tools
+        run: pip install build grpcio-tools
 
-      - name: Install build tool
-        run: pip install build
+      # Generate _pb2.py and _pb2_grpc.py files from your .proto file
+      - name: Generate Protobuf Python files
+        run: |
+          python -m grpc_tools.protoc \
+            -I../protos \
+            --python_out=. \
+            --grpc_python_out=. \
+            ../proto_definitions/*.proto
 
       - name: Build wheel and source distribution
         run: python -m build
