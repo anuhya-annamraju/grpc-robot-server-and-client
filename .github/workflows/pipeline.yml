@@ -3,7 +3,7 @@ name: Build C++ Project
 on: push
 
 jobs:
-  print-job:
+  compile-job:
     runs-on: ubuntu-latest
     
     defaults:
@@ -22,7 +22,7 @@ jobs:
             libgrpc++-dev \
             protobuf-compiler-grpc
       - name: Configure CMake
-        run: cmake -S . -B build
+        run: cmake -S . -B build -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=OFF
 
       - name: Build project
         run: cmake --build build
