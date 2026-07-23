@@ -26,10 +26,10 @@ jobs:
       - name: Generate Protobuf Python files
         run: |
           python -m grpc_tools.protoc \
-            -I../protos \
+            -I.. \
             --python_out=. \
             --grpc_python_out=. \
-            ../proto_definitions/*.proto
+            ../proto_definitions/robot_control_api.proto
 
       - name: Build wheel and source distribution
         run: python -m build
