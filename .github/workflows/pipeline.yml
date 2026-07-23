@@ -33,3 +33,10 @@ jobs:
 
       - name: Build wheel and source distribution
         run: python -m build
+
+      # ADD THIS STEP AT THE END:
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-dist
+          path: grpc_client/dist/
