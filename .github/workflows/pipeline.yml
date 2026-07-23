@@ -1,10 +1,20 @@
-name : Auto generate protobuf files
-
-on: push 
-
-jobs: 
+name: Auto generate cpp protobuf files
+on: push
+jobs:
   print-job:
-   runs-on: ubuntu-latest
-   steps:
-    - name: sample step
-      run: echo "Commit pushed"
+    runs-on: ubuntu-latest
+    
+    # Sets the starting directory for all run steps in this job
+    defaults:
+      run:
+        working-directory: grpc_server
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure CMake
+        run: cmake -S . -B build
+
+      - name: Build project
+        run: cmake --build build
